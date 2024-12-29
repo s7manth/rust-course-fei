@@ -1,9 +1,59 @@
 //! Run this file with `cargo test --test 03_struct`.
 
-// TODO: Implement a `Vec3` structure that represents a three-dimensional vector.
+// DONE: Implement a `Vec3` structure that represents a three-dimensional vector.
 // Use field names `x`, `y` and `z`.
 // Implement `new`, `add`, `length` and `normalize` methods, so that tests pass.
 // If you `normalize` a vector that has length 0, it should return a zero-length vector.
+
+struct Vec3 {
+    x: f64,
+    y: f64,
+    z: f64
+}
+
+fn square(num: f64) -> f64 {
+    num * num
+}
+
+impl Vec3 {
+    const ZERO_VEC: Vec3 = Self {
+        x: 0.0,
+        y: 0.0,
+        z: 0.0
+    };
+
+    fn new(x: f64, y: f64, z: f64) -> Vec3 {
+        Self {
+            x, y, z
+        }
+    }
+
+    fn add(&self, other: Vec3) -> Vec3 {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z
+        }
+    }
+
+    fn length(&self) -> f64 {
+        f64::sqrt(square(self.x) + square(self.y) + square(self.z))
+    }
+
+    fn normalize(&self) -> Vec3 {
+        let l = self.length();
+        
+        if l == 0.0 {
+            return Self::ZERO_VEC;
+        }
+
+        Self {
+            x: self.x / l,
+            y: self.y / l,
+            z: self.z / l
+        }
+    }
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

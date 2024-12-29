@@ -1,6 +1,6 @@
 //! Run this file with `cargo test --test 05_match_parentheses`.
 
-// TODO: Implement a function called `match_parentheses`.
+// DONE: Implement a function called `match_parentheses`.
 // It will receive a string slice (`&str`) containing arbitrary characters.
 //
 // Check that all parentheses within the string (`()`, `[]`, `{}`) are matched properly:
@@ -14,6 +14,44 @@
 // Hint: there is a useful basic data structure that can be used for checking parentheses equality.
 // It rhymes with "Jack" :)
 // You don't even need to implement it fully, just use Vec and perform two operations on it.
+
+use std::collections::HashMap;
+
+fn match_parentheses(input: &str) -> bool {
+    let dict = HashMap::from([
+        ('(', ')'),
+        ('[', ']'),
+        ('{', '}'),
+        ('<', '>'),
+    ]);
+
+    // we are only interested in brackets, we can ignore everything else 
+    let interested: Vec<_> = input.chars().filter(|c| !c.is_alphanumeric()).collect();
+    let mut stack: Vec<char> = Vec::new();
+
+    for b in interested {
+        println!("{:?}", stack);
+        match dict.contains_key(&b) {
+            true => stack.push(b),
+            false => {
+                if stack.len() == 0 {
+                    return false;
+                }
+
+                // validation to check
+                let last = stack.get(stack.len() - 1).unwrap();
+                if Some(&b) == dict.get(last) {
+                    stack.pop();
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+
+    stack.len() == 0
+}
+
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

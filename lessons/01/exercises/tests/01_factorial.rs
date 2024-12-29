@@ -1,6 +1,14 @@
 //! Run this file with `cargo test --test 01_factorial`.
 
-// TODO: Implement a simple factorial function.
+// DONE: Implement a simple factorial function.
+
+fn factorial(number: usize) -> usize {
+    if number == 0 {
+        return 1;
+    }
+    
+    number * factorial(number - 1)
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

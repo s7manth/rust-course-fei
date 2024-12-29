@@ -13,7 +13,8 @@
 ///
 /// Your task is to write a set (at least 8) of unit tests, use them to find (at least 2) bugs in
 /// this function and then fix the function.
-fn sanitize(input: &str) -> &str {
+/// original solution
+fn _old_sanitize(input: &str) -> &str {
     // Remove all x from the end of the string
     let input = input.trim_end_matches("x");
     // Remove all o from the end of the string
@@ -27,7 +28,25 @@ fn sanitize(input: &str) -> &str {
     input
 }
 
-/// TODO: write tests for the `sanitize` function
+/// fixed solution
+fn sanitize(input: &str) -> &str {
+    if input.len() == 0 {
+        return input;
+    }
+
+    let mut result = input;
+    while result.ends_with("x") || result.ends_with("o") || result.ends_with(".exe") {
+        if result.ends_with(".exe") {
+            result = &result[0..result.len() - 4];
+        } else {
+            result = &result[0..result.len() - 1];
+        }
+    }
+
+    result
+}
+
+/// DONE: write tests for the `sanitize` function
 ///
 /// Bonus: can you find any bugs using the [proptest](https://proptest-rs.github.io/proptest/intro.html)
 /// crate?
@@ -36,5 +55,56 @@ fn sanitize(input: &str) -> &str {
 #[cfg(test)]
 mod tests {
     use super::sanitize;
+    use proptest::proptest;
 
+    #[test]
+    fn sanitize_empty() {
+        assert!(sanitize("") == "");
+    }
+
+    #[test]
+    fn sanitize_basic() {
+        assert!(sanitize("windows.exe") == "windows");
+        assert!(sanitize("io") == "i");
+        assert!(sanitize("matrix") == "matri");
+    }
+
+    #[test]
+    fn sanitize_multiple() {
+        assert!(sanitize("windowsx.exe") == "windows");
+        assert!(sanitize("ioo") == "i");
+        assert!(sanitize("matrixx") == "matri");
+    }
+
+    #[test]
+    fn sanitize_complex() {
+        assert!(sanitize("windowsx.exeo") == "windows");
+        assert!(sanitize("ioox") == "i");
+        assert!(sanitize("matrixx.exe") == "matri");
+    }
+
+
+    // bug 1, the cleaning happens sequentially 
+    // one after the other
+    // x -> o -> .exe 
+    // what happens if the occurence of the suffix is jumbled 
+
+    // bug 2 
+    // multiple occurences of the same suffix will also not help 
+    // .exe.exe will result in only one of the suffixes being trimmed 
+
+    // bug 3
+    // the function does not handle the case where the input is empty
+
+    // bug 4
+    // the function assumes alphanumeric inputs 
+
+    proptest! {
+        #[test]
+        fn proptest_checks(s in "\\PC*") {
+            assert!(!sanitize(&s).ends_with("o"));
+            assert!(!sanitize(&s).ends_with("x"));
+            assert!(!sanitize(&s).ends_with(".exe"));
+        }
+    }
 }
