@@ -13,6 +13,58 @@
 // Hint: Put `#[derive(Debug, Eq, PartialEq)]` on top of `ParseError`, `ExecuteError` and `Program`
 // (and any other custom types nested inside them) so that asserts in tests work.
 
+#[derive(Debug, Eq, PartialEq)]
+enum ParseError {
+    UnknownInstruction {
+        location: u32,
+        instruction: char
+    },
+    UnmatchedLoop {
+        location: u32
+    }
+}
+
+#[derive(Debug, Eq, PartialEq)]
+enum ExecuteError {
+    NoInputLeft, 
+    InfiniteLoop
+}
+
+// #[derive(Debug, Eq, PartialEq)]
+// enum BrainfuckError {
+//     Pa(ParseError),
+//     Ex(ExecuteError),
+// }
+
+// impl From<ParseError> for BrainfuckError {
+//     fn from(e: ParseError) -> Self {
+//         GenericError::Pa(e)
+//     }
+// }
+
+// impl From<ExecuteError> for BrainfuckError {
+//     fn from(e: ExecuteError) -> Self {
+//         GenericError::Ex(e)
+//     }
+// }
+
+#[derive(Debug, Eq, PartialEq)]
+struct Program {}
+
+impl Program {
+    fn execute(&self, args: Vec<u8>, nums: Vec<i32>) -> Result<&str, ExecuteError> {
+        Ok("")
+    }
+}
+
+fn parse_program(program_text: &str) -> Result<Program, ParseError> {
+    if program_text.is_empty() {
+        return Ok(Program {});
+    }
+
+    Ok(Program {})
+}
+
 /// Below you can find a set of unit tests.
 #[cfg(test)]
 mod tests {
