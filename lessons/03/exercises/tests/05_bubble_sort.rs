@@ -1,7 +1,22 @@
 //! Run this file with `cargo test --test 05_bubble_sort`.
 
-// TODO: Write a simple bubble sort implementation that receives a unique (mutable) reference
+// DONE: Write a simple bubble sort implementation that receives a unique (mutable) reference
 // to a slice of numbers and sorts them in-place.
+
+fn bubble_sort(arr: &mut [i64]) -> &[i64] {
+    let le = arr.len();
+    for i in 0..le {
+        for j in i..le {
+            if arr[i] >= arr[j] {
+                let temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+
+    arr
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

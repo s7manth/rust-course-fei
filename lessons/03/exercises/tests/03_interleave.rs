@@ -1,6 +1,7 @@
 //! Run this file with `cargo test --test 03_interleave`.
+//! Note: The following implementation requires a nightly compiler `cargo +nightly test --test 03_interleave`. 
 
-// TODO: Implement a function called `interleave`, which will take two string slices and return
+// DONE: Implement a function called `interleave`, which will take two string slices and return
 // a string that contains the characters from the two input strings interleaved.
 // The first character of the output should start with the first character of the first argument.
 // See tests for details.
@@ -8,6 +9,29 @@
 // Can you write the function without any explicit indexing (`str[index]`)?
 //
 // Hint: you can use `string.chars()` to create an iterator over the Unicode characters of a string.
+
+use std::iter::{once, repeat_n};
+use std::cmp::max;
+
+fn interleave(one: &str, two: &str) -> String {
+    if one.is_empty() {
+        return two.to_string();
+    }
+
+    if two.is_empty() { 
+        return one.to_string();
+    }
+
+    const CONTROL: char = '@';
+    let fix = max(one.len(), two.len());
+
+    one.chars()
+        .chain(repeat_n(CONTROL, fix - one.len()))
+        .zip(two.chars().chain(repeat_n(CONTROL, fix - two.len())))
+        .flat_map(|(a, b)| once(a).chain(once(b)))
+        .filter(|&c| c != CONTROL)
+        .collect()
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

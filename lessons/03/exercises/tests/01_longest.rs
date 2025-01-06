@@ -1,7 +1,15 @@
 //! Run this file with `cargo test --test 01_longest`.
 
-// TODO: Implement a function called `longest`, which will return the longer of the two
+// DONE: Implement a function called `longest`, which will return the longer of the two
 // input strings. If they are the same length, return the first string.
+
+fn longest<'a, 'b>(one: &'a str, two: &'b str) -> &'a str where 'a: 'b {
+    if one.len() >= two.len() {
+        one
+    } else {
+        two
+    }
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]
@@ -34,16 +42,20 @@ mod tests {
         assert_eq!(result, &b);
     }
 
-    // TODO: Can we write the `longest` function in a way that the following test compiles?
+    // DONE: Can we write the `longest` function in a way that the following test compiles?
     // The function has to return one of the two input strings, and cannot copy the string data.
     // `longest` should return the first string in this case, so it should be fine to
     // drop `b`. Right? :)
-    // #[test]
-    // fn longest_different_lifetimes_drop() {
-    //     let a = "longer";
-    //     let b = String::from("short");
-    //     let result = longest(a, &b);
-    //     drop(b);
-    //     assert_eq!(result, "longer");
-    // }
+
+    // `String` has a non-static lifetime as its allocated on the heap 
+    // whereas &str is a slice that is statically allocated in the binary 
+    // doesn't get copied onto the stack, just referenced using `&`
+    #[test]
+    fn longest_different_lifetimes_drop() {
+        let a = "longer";
+        let b = String::from("short");
+        let result = longest(a, &b);
+        drop(b);
+        assert_eq!(result, "longer");
+    }
 }
