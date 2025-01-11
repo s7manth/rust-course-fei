@@ -1,9 +1,60 @@
 //! Run this file with `cargo test --test 01_shape`.
 
-//! TODO: Create a trait `Shape` with methods for calculating the area and perimeter of a geometrical
+//! DONE: Create a trait `Shape` with methods for calculating the area and perimeter of a geometrical
 //! object. Then create two simple geometrical objects (`Rectangle` and `Circle`) and implement
 //! the `Shape` trait for both of them.
 
+use std::f64::consts::PI;
+
+trait Shape {
+    fn area(&self) -> f64;
+    fn perimeter(&self) -> f64;
+}
+
+struct Rectangle {
+    length: f64,
+    height: f64
+}
+
+struct Circle {
+    radius: f64
+}
+
+impl Rectangle {
+    fn new(length: f64, height: f64) -> Self {
+        Self {
+            length, height
+        }
+    }
+}
+
+impl Circle {
+    fn new(radius: f64) -> Self {
+        Self {
+            radius
+        }
+    }
+}
+
+impl Shape for Rectangle {
+    fn area(&self) -> f64 {
+        self.height * self.length
+    }
+
+    fn perimeter(&self) -> f64 {
+        2.0 * (self.height + self.length)
+    }
+}
+
+impl Shape for Circle {
+    fn area(&self) -> f64 {
+        PI * self.radius * self.radius
+    }
+
+    fn perimeter(&self) -> f64 {
+        2.0 * PI * self.radius
+    }
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

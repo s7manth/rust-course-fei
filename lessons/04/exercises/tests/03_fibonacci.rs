@@ -1,8 +1,35 @@
 //! Run this file with `cargo test --test 03_fibonacci`.
 
-//! TODO: Implement a struct called `Fibonacci`, which implements `Iterator` that iterates through
+//! DONE: Implement a struct called `Fibonacci`, which implements `Iterator` that iterates through
 //! Fibonacci numbers (starting from 0).
 //! `Fibonacci` should implement the `Default` trait.
+
+use std::iter::Iterator;
+
+struct Fibonacci {
+    a: u64, 
+    b: u64
+}
+
+impl Fibonacci {
+    fn default() -> Self {
+        Self {
+            a: 0,
+            b: 1
+        }
+    }
+}
+
+impl Iterator for Fibonacci {
+    type Item = u64;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let result = self.a;
+        self.a = self.b;
+        self.b += result;
+        Some(result)
+    }
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

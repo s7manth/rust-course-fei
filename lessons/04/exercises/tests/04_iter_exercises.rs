@@ -1,12 +1,20 @@
 //! Run this file with `cargo test --test 04_iter_exercises`.
 
-//! TODO: Implement a function called `keep_even`, which will receive something that can be turned into
+//! DONE: Implement a function called `keep_even`, which will receive something that can be turned into
 //! an iterator (`IntoIterator`) of generic items, and return an iterator that will keep only the even
 //! elements (so 0th element, 2nd element, etc.).
 //! Try to implement the returned iterator using iterator adapters, not an explicit struct.
 //! Use `impl Iterator` for the return type.
 
-/// TODO: Implement a function called `find_third_42`, which find the index
+use std::fmt::Debug;
+
+fn keep_even<T>(i: T) -> impl Iterator<Item = T::Item>
+    where T: IntoIterator,
+    T::Item: Debug {
+    i.into_iter().step_by(2)
+}
+
+/// DONE: Implement a function called `find_third_42`, which find the index
 /// of the **third** occurrence of the number 42 in the input slice.
 ///
 /// Try to implement the function using iterator adapters.
@@ -14,7 +22,12 @@
 /// Example 1: `[0,1,42,3,42,5,6,42,8,9]` -> Some(7)
 /// Example 2: `[0,1,42,3,42,5,6,7,8,9]` -> None
 fn find_third_42(vec: &[i64]) -> Option<usize> {
-    todo!()
+    vec.into_iter()
+        .enumerate()
+        .filter(|(_index, &num)| num == 42)
+        .skip(2)
+        .map(|(index, _num)| index)
+        .next()
 }
 
 /// Below you can find a set of unit tests.

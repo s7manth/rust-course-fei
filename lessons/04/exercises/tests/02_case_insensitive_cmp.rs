@@ -1,8 +1,24 @@
 //! Run this file with `cargo test --test 02_case_insensitive_cmp`.
 
-//! TODO: Implement a struct `CaseInsensitive`, which will allow comparing (=, <, >, etc.)
+//! DONE: Implement a struct `CaseInsensitive`, which will allow comparing (=, <, >, etc.)
 //! two (ASCII) string slices in a case insensitive way, without performing any reallocations
 //! and without modifying the original strings.
+
+use std::cmp::{PartialEq, PartialOrd, Ordering};
+
+struct CaseInsensitive<'a>(&'a str);
+
+impl PartialEq for CaseInsensitive<'_> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.to_lowercase().eq(&other.0.to_lowercase())
+    }
+}
+
+impl PartialOrd for CaseInsensitive<'_> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.0.to_lowercase().partial_cmp(&other.0.to_lowercase())
+    }
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]
