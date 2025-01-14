@@ -1,6 +1,6 @@
 //! Run this file with `cargo test --test 08_range`.
 
-//! TODO: write a simple data structure called `Range1D`, which represents a range of
+//! DONE: write a simple data structure called `Range1D`, which represents a range of
 //! 64-bit integers. Both sides of the range (start and end) are **inclusive**, e.g. a range
 //! `[1, 5]` represents integers `1, 2, 3, 4, 5`.
 //!
@@ -19,6 +19,68 @@
 //!
 //! Obviously, the range should be sparse; store only the start and end values in memory, not all
 //! numbers in the range :) Otherwise tests will explode.
+
+use std::iter::{self, Iterator};
+use std::clone::Clone;
+use std::cmp::{min, max};
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+struct Range1D {
+    start: u64,
+    end: u64,
+}
+
+impl Range1D {
+    fn new(start: u64, end: u64) -> Option<Self> {
+        if end < start {
+            panic!("Start must not be larger than end");
+        }
+
+        Some(Self {
+            start, end
+        })
+    }
+
+    fn len(&self) -> usize {
+        (self.end - self.start + 1) as usize
+    }
+
+    fn start(&self) -> u64 {
+        self.start
+    }
+
+    fn end(&self) -> u64 {
+        self.end
+    }
+
+    fn contains(&self, c: u64) -> bool {
+        c >= self.start && c <= self.end
+    }
+
+    fn intersect(&self, other: Self) -> Option<Self> {
+        if self.end < other.start || other.end < self.start {
+            return None;
+        }
+
+        Some(Self {
+            start: max(self.start, other.start), 
+            end: min(self.end, other.end)
+        })
+    }
+
+    fn iter(&self) -> impl Iterator<Item = u64> + '_ {
+        let mut count = self.start;
+        iter::from_fn(move || {
+            if count <= self.end {
+                let result = count;
+                count += 1;
+                Some(result)
+            } else {
+                None
+            }
+        })
+    }
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

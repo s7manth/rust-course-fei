@@ -1,6 +1,6 @@
 //! Run this file with `cargo test --test 06_cumulative_sum`.
 
-//! TODO: Implement a struct called `CumulativeSum`, which will be generic over two types - a value
+//! DONE: Implement a struct called `CumulativeSum`, which will be generic over two types - a value
 //! type and an iterator over these value types. `CumulativeSum` will itself serve as an iterator,
 //! which will return a cumulative sum of the items from the input iterator.
 //! E.g. `CumulativeSum::new(vec![1, 2, 3])` will iterate `1`, `3`, and `6`.
@@ -10,6 +10,41 @@
 //!
 //! Think about the various trait bounds that you will require for `CumulativeSum` to work.
 //! What operations have to be supported by the two generic types?
+
+use std::ops::Add;
+
+struct CumulativeSum<I, T> {
+    iter: I,
+    sum: T,
+}
+
+impl<I, T> CumulativeSum<I, T>
+where
+    I: Iterator<Item = T>,
+    T: Add<Output = T> + Default + Copy,
+{
+    fn new(iter: I) -> Self {
+        Self { iter, sum: T::default() }
+    }
+}
+
+impl<I, T> Iterator for CumulativeSum<I, T> 
+where
+    I: Iterator<Item = T>,
+    T: Add<Output = T> + Default + Copy,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.iter.next() {
+            Some(value) => {
+                self.sum = value + self.sum;
+                Some(self.sum)
+            },
+            None => None,
+        }
+    }
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]
