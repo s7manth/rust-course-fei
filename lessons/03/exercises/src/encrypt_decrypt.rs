@@ -21,6 +21,54 @@
 //!
 //! Use ownership and move semantics to guarantee the rules described above.
 
+pub struct Data {
+    pub data: Vec<u8>,
+}
+
+pub struct EncryptedData {
+    pub data: Vec<u8>,
+    pub key: u8,
+}
+
+impl Data {
+    pub fn new(data: Vec<u8>) -> Self {
+        Self { 
+            data,
+        }
+    }
+
+    pub fn encrypt(self, key: u8) -> EncryptedData {
+        EncryptedData {
+            data: self.data, key
+        }
+    }
+
+    pub fn read(&mut self) -> Option<u8> {
+        match self.data.is_empty() { 
+            true => None,
+            false => Some(self.data.remove(0))
+        }
+    }
+}
+
+impl EncryptedData {
+    pub fn decrypt(self, key: u8) -> Result<Data, EncryptedData> {
+        match self.key == key {
+            true => Ok(Data {
+                data: self.data
+            }),
+            false => Err(self)
+        }
+    }
+
+    pub fn read(&mut self) -> Option<u8> {
+        match self.data.is_empty() { 
+            true => None,
+            false => Some(self.key ^ self.data.remove(0)),
+        }
+    }
+}
+
 // The doctests below should fail to compile.
 // We need to use doctests, otherwise we could not check that the code does not compile.
 // To debug the tests, try to remove the `compile_fail` attribute and run `cargo test` to see what
