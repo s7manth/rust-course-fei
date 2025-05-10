@@ -4,7 +4,7 @@
 //! Try to implement it using structs (without enums), and then later implement it using
 //! enums in the assignment, and compare both approaches.
 
-// TODO: Implement the `pc_transition` function.
+// DONE: Implement the `pc_transition` function.
 // A computer can be in three states (off, running or sleeping).
 // It can receive four events (turn on, turn off, pass some amount of time and mouse move).
 //
@@ -22,35 +22,55 @@
 //   - If the PC is running and its `idle_time` is larger than 1000, it switches to `Sleeping`.
 //   - If the PC is sleeping and its `sleep_time` is larger than 500, it switches to `Off`.
 
+#[derive(PartialEq)]
+enum Status {
+    Off, 
+    Running, 
+    Sleeping
+}
+
 struct ComputerState {
-    // TODO: represent the state of the computer
+    status: Status,
+    up_time: u32,
+    idle_time: u32,
+    sleep_time: u32,
 }
 
 impl ComputerState {
     // Returns a computer that is turned off
     fn new_off() -> Self {
-        todo!()
+        Self {
+            status: Status::Off,
+            up_time: 0,
+            idle_time: 0,
+            sleep_time: 0,
+        }
     }
 
     // Returns a computer that is turned on
     fn new_on() -> Self {
-        todo!()
+        Self {
+            status: Status::Running,
+            up_time: 0,
+            idle_time: 0,
+            sleep_time: 0,
+        }
     }
 
     fn is_on(&self) -> bool {
-        todo!()
+        self.status == Status::Running || self.status == Status::Sleeping
     }
     fn is_sleeping(&self) -> bool {
-        todo!()
+        self.status == Status::Sleeping
     }
     fn uptime(&self) -> u32 {
-        todo!()
+        self.up_time
     }
     fn idle_time(&self) -> u32 {
-        todo!()
+        self.idle_time
     }
     fn sleep_time(&self) -> u32 {
-        todo!()
+        self.sleep_time
     }
 }
 
@@ -61,8 +81,73 @@ enum Event {
     MoveMouse,
 }
 
+fn check_for_shutdown(computer: &mut ComputerState) {
+    if computer.sleep_time > 500 {
+        computer.sleep_time = 0;
+        computer.idle_time = 0;
+        computer.up_time = 0;
+        computer.status = Status::Off;
+    }
+}
+
 fn pc_transition(mut computer: ComputerState, event: Event) -> ComputerState {
-    todo!()
+    match event {
+        Event::TurnOn => {
+            match computer.status {
+                Status::Off => {
+                    computer.status = Status::Running;
+                },
+                Status::Running => {},
+                Status::Sleeping => {
+                    computer.idle_time = 0;
+                },
+            }
+        },
+        Event::TurnOff => {
+            computer.status = Status::Off;
+            computer.idle_time = 0;
+            computer.sleep_time = 0;
+            computer.up_time = 0;
+        },
+        Event::PassTime(time) => {
+            match computer.status {
+                Status::Off => {},
+                Status::Running => {
+                    computer.up_time += time;
+                    computer.idle_time += time;
+
+                    if computer.idle_time > 1000 {
+                        computer.sleep_time += computer.idle_time - 1000;
+                        computer.idle_time = 0;
+                        computer.status = Status::Sleeping;
+
+                        check_for_shutdown(&mut computer);
+                    }
+                },
+                Status::Sleeping => {
+                    computer.up_time += time;
+                    computer.sleep_time += time;
+
+                    check_for_shutdown(&mut computer);
+                },
+            }
+        },
+        Event::MoveMouse => {
+            match computer.status {
+                Status::Off => {},
+                Status::Running => {
+                    computer.idle_time = 0;
+                },
+                Status::Sleeping => {
+                    computer.idle_time = 0;
+                    computer.sleep_time = 0;
+                    computer.status = Status::Running;
+                },
+            }
+        },
+    }
+
+    computer
 }
 
 /// Below you can find a set of unit tests.

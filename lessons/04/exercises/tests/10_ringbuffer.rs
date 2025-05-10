@@ -1,6 +1,6 @@
 //! Run this file with `cargo test --test 10_ringbuffer`.
 
-//! TODO: Write a ringbuffer data structure.
+//! DONE: Write a ringbuffer data structure.
 //!
 //! Ringbuffer is a fixed-size queue that is often used to buffer data before it can be processed.
 //! It can be used e.g. to remember a set of keyboard presses until the CPU can deal with them.
@@ -40,20 +40,58 @@
 //! You don't need to use `unsafe`, pointers, or anything special, just use the simplest data
 //! representation that you can think of. The implementation should fit within 120 lines of code.
 
-/// TODO(bonus): write a simple "DSL" (domain-specific language) that can
-/// be used to test the ringbuffer in a more visual way.
-/// For example, you could create a function that "renders" the ringbuffer
-/// to a string like this:
-/// ```
-/// [1, 2, 3, 1, 3, _, _, _, _, 1, 2, 3, 3, 2]
-/// _            ^ end          ^ start
-/// ```
-/// and then you can rewrite the tests to assert that the ringbuffer
-/// has a specific state represented by that string. This would make
-/// checking that the ringbuffer behaves as you expect much easier.
-/// The render function can assume that the buffer only contains unsigned
-/// integers smaller than 10, to simplify the rendering code.
-///
+struct RingBuffer<T> {
+    data: Vec<T>,
+    capacity: usize,
+}
+
+impl<T> RingBuffer<T> {
+    fn new(capacity: usize) -> Self {
+        Self {
+            data: Vec::<T>::with_capacity(capacity),
+            capacity,
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.data.len()
+    }
+
+    fn enqueue(&mut self, element: T) -> Option<T> {
+        if self.capacity == 0 {
+            return None;
+        }
+
+        let mut result: Option<T> = None;
+        if self.data.len() == self.capacity {
+            result = Some(self.data.remove(0));
+        }
+
+        self.data.push(element);
+        result
+    }
+
+    fn dequeue(&mut self) -> Option<T> {
+        if self.data.len() > 0 {
+            return Some(self.data.remove(0));
+        }
+
+        None
+    }
+
+    fn peek(&self) -> Option<&T> {
+        if self.data.len() > 0 {
+            return Some(self.data.get(0)?);
+        }
+
+        None
+    }
+
+    fn iter(&self) -> impl Iterator<Item = &T> {
+        self.data.iter()
+    }
+}
+
 /// Below you can find a set of unit tests.
 #[cfg(test)]
 mod tests {

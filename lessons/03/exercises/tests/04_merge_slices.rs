@@ -1,12 +1,47 @@
 //! Run this file with `cargo test --test 04_merge_slices`.
 
-//! TODO: Implement a function called `merge_slices`, which is useful for the merge sort algorithm.
+//! DONE: Implement a function called `merge_slices`, which is useful for the merge sort algorithm.
 //! It will take two sorted `u32` slices as inputs and merge them into a sorted vector (Vec).
 //! The function will return the vector.
 //!
 //! The time complexity of this function has to be O(n).
 //!
 //! Bonus: Can you build a complete merge sort on top of this function? :)
+
+fn merge_slices(one: &[u32], two: &[u32]) -> Vec<u32> {
+    let mut first = 0;
+    let mut second = 0;
+
+    let lone = one.len();
+    let tone = two.len();
+
+    let mut result: Vec<u32> = Vec::new();
+
+    while first < lone && second < tone {
+        match one[first] <= two[second] {
+            true => {
+                result.push(one[first]);
+                first += 1;
+            }, 
+            false => {
+                result.push(two[second]);
+                second += 1;
+            }
+        }
+    }
+
+    while first < lone { 
+        result.push(one[first]);
+        first += 1;
+    }
+
+    while second < tone { 
+        result.push(two[second]);
+        second += 1;
+    }
+
+    result
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

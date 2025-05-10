@@ -1,11 +1,18 @@
 //! Run this file with `cargo test --test 02_strip_prefix`.
 
-// TODO: Implement a function called `strip_prefix`, which will take two strings (`needle` and `prefix`).
+// DONE: Implement a function called `strip_prefix`, which will take two strings (`needle` and `prefix`).
 // It will return a substring of `needle` starting at the first character that is not contained
 // in `prefix`.
 // See tests for examples. Take a look at the `strip_prefix_lifetime_check` test!
 //
 // Hint: you can use `string.chars()` for iterating the Unicode characters of a string.
+
+fn strip_prefix<'a>(needle: &'a str, prefix: &str) -> &'a str {
+    match needle.find(|c: char| !prefix.contains(c)) {
+        Some(index) => &needle[index..],
+        None => ""
+    }
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]
@@ -39,7 +46,7 @@ mod tests {
         let result = strip_prefix(needle, &prefix);
         // TODO: Uncomment the `drop(prefix)` line.
         // Does the test still work? If not, fix `strip_prefix`!
-        // drop(prefix);
+        drop(prefix);
         assert_eq!(result, "oobar");
     }
 }

@@ -1,6 +1,6 @@
 //! Run this file with `cargo test --test 05_split_items`.
 
-//! TODO: Implement a struct called `SplitItems`, which will receive a string slice and a delimiter
+//! DONE: Implement a struct called `SplitItems`, which will receive a string slice and a delimiter
 //! char in its constructor.
 //!
 //! The struct should act as an iterator which iterates over all substrings of the input, separated
@@ -9,6 +9,46 @@
 //!
 //! The iterator has to be **lazy**! It should not copy the whole input array
 //! (in other words, it should have space complexity O(1)).
+
+use std::iter::Iterator;
+
+struct SplitItems<'a> {
+    remainder: &'a str,
+    delimiter: char
+}
+
+impl<'a> SplitItems<'a> {
+    fn new(remainder: &'a str, delimiter: char) -> Self {
+        Self {
+            remainder, delimiter
+        }
+    }
+}
+
+impl<'a> Iterator for SplitItems<'a> {
+    type Item = &'a str;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some(index) = self.remainder.find(self.delimiter) {
+            let chunk = &self.remainder[..index];
+            self.remainder = &self.remainder[index + self.delimiter.len_utf8()..];
+
+            if chunk.is_empty() {
+                continue;
+            }
+
+            return Some(chunk);
+        } 
+        
+        if self.remainder.len() > 0 {
+            let chunk = self.remainder;
+            self.remainder = &self.remainder[0..0];
+            Some(chunk)
+        } else {
+            None
+        }
+    }
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

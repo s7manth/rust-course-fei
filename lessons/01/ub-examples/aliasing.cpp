@@ -1,6 +1,8 @@
 #include <vector>
 #include <iostream>
 
+// after the first iteration, the value at the start of the array changes to 4
+// which is then used as the incrementing factor for the other elements
 void add_numbers(std::vector<int> &items, const int &value) {
     for (auto &item: items) {
         item += value;

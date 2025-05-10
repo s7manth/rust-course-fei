@@ -1,10 +1,21 @@
 //! Run this file with `cargo test --test 02_array_max`.
 
-// TODO: Implement a function that finds the maximum number of an array.
+// DONE: Implement a function that finds the maximum number of an array.
 // Implement it manually with a `for` cycle or `loop`.
 //
 // The input argument is an array of ten `i32` integers.
 // How does that type look like in Rust?
+
+fn find_largest(arr: [i32; 10]) -> i32 {
+    let mut max = i32::MIN;
+    for num in arr {
+        if num > max {
+            max = num;
+        }
+    }
+
+    max
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

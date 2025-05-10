@@ -1,6 +1,6 @@
 //! Run this file with `cargo test --test 09_poker_hand_value`.
 
-//! TODO: let's play some poker :)
+//! DONE: let's play some poker :)
 //!
 //! Below you can find a representation of cards and a "poker hand" with exactly 5 cards drawn.
 //! You have two tasks:
@@ -128,16 +128,77 @@ impl PartialOrd for Hand {
 }
 
 impl Ord for Hand {
-    // TODO: implement this method
     fn cmp(&self, other: &Self) -> Ordering {
-        todo!()
+        let sh = self.value();
+        let oh = other.value();
+
+        if sh != oh {
+            return sh.cmp(&oh)
+        }
+
+        // if both belong to the same hierarchy, use a discriminant
+        let mut pointer = 0;
+
+        while self.cards[pointer].eq(&other.cards[pointer]) {
+            pointer += 1;
+        }
+
+        return self.cards[pointer].cmp(&other.cards[pointer]);   
     }
 }
 
 impl Hand {
-    // TODO: implement this method
     fn value(&self) -> HandValue {
-        todo!()
+        let scorecard: &mut [u8; 13] = &mut [0u8; 13];
+        self.cards.iter().for_each(|card| match card {
+            Card::Numeric(number) => scorecard[*number as usize - 2] += 1,
+            Card::Jack => scorecard[9] += 1,
+            Card::Queen => scorecard[10] += 1,
+            Card::King => scorecard[11] += 1,
+            Card::Ace => scorecard[12] += 1,
+        });
+
+        // 5
+        // 4, 1
+        // 3, 2
+        // 3, 1, 1
+        // 2, 2, 1
+        // 2, 1, 1, 1
+        // 1, 1, 1, 1, 1
+
+        let mut pairs: HashMap<u8, u8> = HashMap::new();
+        for &count in scorecard.iter() {
+            if count == 0 {
+                continue;
+            }
+            *pairs.entry(count).or_insert(0) += 1;
+        }
+
+        if pairs.get(&5).is_some() {
+            return HandValue::FiveOfAKind;
+        }
+
+        if pairs.get(&4).is_some() {
+            return HandValue::FourOfAKind;
+        }
+
+        if pairs.get(&3).is_some() && pairs.get(&2).is_some() {
+            return HandValue::FullHouse;
+        }
+
+        if pairs.get(&3).is_some() {
+            return HandValue::ThreeOfAKind;
+        }
+
+        if pairs.get(&2).unwrap_or(&0) == &2 {
+            return HandValue::TwoPairs;
+        }
+
+        if pairs.get(&2).is_some() {
+            return HandValue::OnePair;
+        }
+
+        HandValue::HighCard
     }
 }
 

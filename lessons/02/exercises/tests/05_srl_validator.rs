@@ -1,6 +1,6 @@
 //! Run this file with `cargo test --test 05_srl_validator`.
 
-// TODO: Implement a SRL (Simple Resource Locator) validator.
+// DONE: Implement a SRL (Simple Resource Locator) validator.
 // A SRL consists of two parts, an optional protocol (string) and an address (string).
 // The format of the SRL looks like this: `[<protocol>://]<address>`
 // The protocol and the address have to contain only lowercase English characters.
@@ -24,6 +24,81 @@
 //
 // Hint: Put `#[derive(Debug, Eq, PartialEq)]` on top of `SRL` and `SRLValidationError`,
 // so that asserts in tests work.
+
+mod srl {
+    #[derive(Debug, Eq, PartialEq)]
+    pub struct SRL<'a> {
+        protocol: Option<&'a str>, 
+        address: &'a str,
+    }
+
+    #[derive(Debug, Eq, PartialEq)]
+    pub enum SRLValidationError {
+        EmptyAddress,
+        EmptyProtocol,
+        InvalidCharacterInAddress(char),
+        InvalidCharacterInProtocol(char),
+    }
+
+    impl<'a> SRL<'a> {
+        const PROTOCOL_SEPARATOR: &'static str = "://";
+        pub fn new(init: &'a str) -> Result<SRL<'a>, SRLValidationError> {
+            if init.starts_with(SRL::PROTOCOL_SEPARATOR) {
+                return Err(SRLValidationError::EmptyProtocol);
+            }
+
+            if init.len() == 0 || init.ends_with(SRL::PROTOCOL_SEPARATOR) {
+                return Err(SRLValidationError::EmptyAddress);
+            }
+
+            // check if there is a protocol in the first place 
+            match init.contains(SRL::PROTOCOL_SEPARATOR) {
+                true => {
+                    let v = init.split_once(SRL::PROTOCOL_SEPARATOR).unwrap();
+
+                    println!("{:?}", v);
+
+                    match Self::character_validator(v.0) {
+                        Some(index) => return Err(SRLValidationError::InvalidCharacterInProtocol(v.0.chars().nth(index).unwrap())),
+                        None => {}
+                    }
+
+                    match Self::character_validator(v.1) {
+                        Some(index) => return Err(SRLValidationError::InvalidCharacterInAddress(v.1.chars().nth(index).unwrap())),
+                        None => {}
+                    }
+
+                    Ok(SRL {
+                        protocol: Some(v.0),
+                        address: v.1,
+                    })
+                },
+                false => {
+                    // validate the address 
+                    match Self::character_validator(init) {
+                        Some(index) => return Err(SRLValidationError::InvalidCharacterInAddress(init.chars().nth(index).unwrap())),
+                        None => Ok(SRL {
+                            protocol: None,
+                            address: init
+                        })
+                    }
+                }
+            }
+        }
+
+        fn character_validator(input: &'a str) -> Option<usize> {
+            input.find(|c: char| !(c.is_alphabetic() && c.is_lowercase()))
+        }
+
+        pub fn get_address(&self) -> &'a str {
+            self.address
+        }
+
+        pub fn get_protocol(&self) -> Option<&'a str> {
+            self.protocol
+        }
+    }
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

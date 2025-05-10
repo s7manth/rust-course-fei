@@ -26,7 +26,7 @@ enum Event {
     MoveMouse,
 }
 
-// TODO: Implement the `pc_transition` function.
+// DONE: Implement the `pc_transition` function.
 // A computer can be in three states (off, running or sleeping).
 // It can receive four events (turn on, turn off, pass some amount of time and mouse move).
 //
@@ -50,6 +50,78 @@ enum Event {
 //
 // Compare this approach with using a struct (which we did on the lesson).
 // Is it easier with an enum or with a struct?
+
+fn check_for_shutdown(computer: ComputerState) -> ComputerState {
+    match computer {
+        ComputerState::Sleeping {
+            sleep_time,
+            ..
+        } => {
+            if sleep_time > 500 {
+                return ComputerState::Off;
+            }
+
+            computer
+        },
+        _ => computer
+    }
+}
+
+fn pc_transition(computer: ComputerState, event: Event) -> ComputerState {
+    match event {
+        Event::TurnOn => {
+            match computer {
+                ComputerState::Off => ComputerState::Running {
+                    uptime: 0,
+                    idle_time: 0,
+                },
+                ComputerState::Running { .. } | ComputerState::Sleeping { .. } => computer,
+            }
+        },
+        Event::TurnOff => {
+            match computer {
+                ComputerState::Off | ComputerState::Running { .. } | ComputerState::Sleeping { .. } => ComputerState::Off,
+            }
+        },
+        Event::PassTime(time) => {
+            match computer {
+                ComputerState::Off => {ComputerState::Off},
+                ComputerState::Running {
+                    uptime,
+                    idle_time,
+                } => {
+                    if idle_time + time > 1000 {
+                        return check_for_shutdown(ComputerState::Sleeping {
+                            uptime: uptime + time,
+                            sleep_time: idle_time + time - 1000,
+                        });
+                    }
+
+                    ComputerState::Running {
+                        uptime: uptime + time,
+                        idle_time: idle_time + time,
+                    }
+            },
+                ComputerState::Sleeping {
+                    uptime,
+                    sleep_time,
+                } => check_for_shutdown(ComputerState::Sleeping {
+                    uptime: uptime + time,
+                    sleep_time: sleep_time + time,
+                }),
+            }
+        },
+        Event::MoveMouse => {
+            match computer {
+                ComputerState::Off => ComputerState::Off,
+                ComputerState::Running { uptime, .. } | ComputerState::Sleeping { uptime, .. } => ComputerState::Running {
+                    uptime,
+                    idle_time: 0,
+                },
+            }
+        },
+    }
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]

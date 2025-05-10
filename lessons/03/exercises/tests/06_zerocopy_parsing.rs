@@ -1,6 +1,6 @@
 //! Run this file with `cargo test --test 06_zerocopy_parsing`.
 
-// TODO: Write a BLAZINGLY FAST, high-performance zero-copy parser of... *checks notes* cinema tickets?
+// DONE: Write a BLAZINGLY FAST, high-performance zero-copy parser of... *checks notes* cinema tickets?
 //
 // Implement a function `parse_ticket` that receives a string slice and returns either
 // a parsed ticket (if the parsing went fine) or `None` (if the ticket could not have been parsed).
@@ -23,6 +23,83 @@
 //
 // The format of the ticket is `<movie-name>;<day>;<visitor-name>`. The second semicolon is optional
 // when the visitor name is missing. There must not be any trailing data in the input string.
+
+use std::str::FromStr;
+
+#[derive(Debug)]
+enum Day {
+    Monday, 
+    Tuesday, 
+    Wednesday, 
+    Thursday, 
+    Friday, 
+    Saturday, 
+    Sunday
+}
+
+impl FromStr for Day {
+
+    type Err = &'static str;
+
+    fn from_str(input: &str) -> Result<Day, Self::Err> {
+        println!("{}", input);
+        match input.to_lowercase().as_ref() {
+            "monday" => Ok(Day::Monday),
+            "tuesday" => Ok(Day::Tuesday),
+            "wednesday" => Ok(Day::Wednesday),
+            "thursday" => Ok(Day::Thursday),
+            "friday" => Ok(Day::Friday),
+            "saturday" => Ok(Day::Saturday),
+            "sunday" => Ok(Day::Sunday),
+            _  => Err("ticket expected"),
+        }
+    }
+}
+
+#[derive(Debug)]
+struct Ticket<'a> {
+    movie: &'a str, 
+    day: Day,
+    visitor: Option<&'a str>
+}
+
+fn parse_ticket(description: &str) -> Option<Ticket> {
+    if description.is_empty() {
+        return None;
+    }
+
+    let chunks = description.split(';').collect::<Vec<&str>>();
+    let l = chunks.len();
+
+    if l > 3 || l < 2 {
+        return None;
+    }
+
+    if chunks[0].is_empty() {
+        return None;
+    }
+
+    println!("{:?}", chunks);
+
+    match chunks[0].chars().find(|c: &char| !(c.is_alphanumeric() || c.is_whitespace())) {
+        Some(_index) => return None,
+        None => {}
+    };
+
+    Some(Ticket {
+        movie: chunks[0], 
+        day: match Day::from_str(chunks[1]) {
+            Ok(d) => d,
+            Err(_) => return None,
+        },
+        visitor: if chunks.len() == 2 || chunks[2].is_empty() { None } else {
+            match chunks[2].chars().find(|c: &char| !(c.is_ascii_alphanumeric() || c.is_whitespace())) {
+                Some(_index) => return None,
+                None => Some(chunks[2])
+            }
+        }
+    })
+}
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]
